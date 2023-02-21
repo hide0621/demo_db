@@ -50,4 +50,20 @@ class ControllerTests {
             .andExpect(content().string("Saved"))
     }
 
+    @Test
+    @Sql(statements = ["INSERT INTO users (name) VALUES ('update_data'); "])
+    fun updateUserTest() {
+
+        val lastUser: Users = target.userRepository.findAll().last()
+
+        mockMvc.perform(
+            post("/update")
+                .param("id", lastUser.id.toString())
+                .param("name", "updated!!!")
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().string("Updated"))
+
+    }
+
 }
