@@ -51,7 +51,7 @@ class ControllerTests {
     }
 
     @Test
-    @Sql(statements = ["INSERT INTO users (name) VALUES ('update_data'); "])
+    @Sql(statements = ["INSERT INTO users (name) VALUES ('update_data');"])
     fun updateUserTest() {
 
         val lastUser: Users = target.userRepository.findAll().last()
@@ -63,7 +63,30 @@ class ControllerTests {
         )
             .andExpect(status().isOk)
             .andExpect(content().string("Updated"))
+    }
 
+    @Test
+    fun deleteNoUserTest() {
+        mockMvc.perform(
+            post("/delete")
+                .param("id", "-1")
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().string("Non User"))
+    }
+
+    @Test
+    @Sql(statements = ["INSERT INTO users (name) VALUES ('delete_data');"])
+    fun deleteUserTest() {
+
+        val lastUser: Users = target.userRepository.findAll().last()
+
+        mockMvc.perform(
+            post("/delete")
+                .param("id", lastUser.id.toString())
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().string("Deleted"))
     }
 
 }
